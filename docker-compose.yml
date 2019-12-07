@@ -1,0 +1,55 @@
+magento2:
+  container_name: magento2
+  build: .
+  ports:
+    - 80:80
+  environment:
+    APPLICATION_ENV: development
+    MAGENTO_BASE_URL: ${MAGENTO_BASE_URL}
+  command: sh /init.sh
+  links:
+    - magento2_mysql
+  volumes:
+    - ./config/init.sh:/init.sh
+    - ./config/nginx/vhost.conf:/etc/nginx/sites-enabled/default
+    - ./config/nginx/php.ini:/etc/php/7.3/fpm/php.ini
+    - ./mage2/:/var/www/html
+    - ./config/auth.json:/root/.composer/auth.json
+    - ./var/log/nginx:/var/log/nginx
+    - ./var/log/php-fpm:/var/log/php-fpm
+    - /root/.bash_history
+magento2_mysql:
+  container_name: magento2_mysql
+  image: mysql:5.7
+  restart: always
+  ports:
+    - 3306:3306
+  environment:
+    MYSQL_DATABASE: "magento2"
+    MYSQL_ROOT_PASSWORD: ""
+    MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+  volumes:
+    - ./config/mysql/my.cnf:/etc/mysql/conf.d/my.cnf
+    - ./data/mysql:/var/lib/mysql
+  command: bash -c "chmod 644 /etc/mysql/conf.d/*.cnf && /entrypoint.sh mysqld"
+phpmyadmin:
+  container_name: magento2_phpmyadmin
+  image: phpmyadmin/phpmyadmin
+  restart: always
+  links:
+    - magento2_mysql
+  environment:
+    PMA_HOST: magento2_mysql
+    PMA_PORT: 3306
+  ports:
+    - '8080:80'
+
+#redis:
+    # https://hub.docker.com/_/redis/
+   # container_name: magento2_redis
+   # image: redis:latest
+   # restart: always
+   # ports:
+   #  - "6379:6379"
+    #volumes:
+   #  - redis-data:/data
