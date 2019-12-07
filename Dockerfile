@@ -1,7 +1,7 @@
 FROM ubuntu:16.04
 MAINTAINER chamara <chamarabuddika@yahoo.com>
 
-LABEL version="1.0" description="Environment for magento2 with nginx, php7 and mysql."
+LABEL version="1.0" description="magento2 with nginx, php7 and mysql."
 
 RUN apt-get update \
     && apt-get -y install software-properties-common \
